@@ -158,6 +158,15 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 // health
-app.get('/', (req, res) => res.json({ ok: true, now: new Date() }));
+// app.get('/', (req, res) => res.json({ ok: true, now: new Date() }));
+app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+setInterval(async () => {
+  try {
+    await fetch("https://continental-rw1u.onrender.com/api/health");
+    console.log("Pinged App continental");
+  } catch (err) {
+    console.error("Failed to ping App continental:", err.message);
+  }
+}, 10 * 60 * 1000); // every 10 minutes
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
