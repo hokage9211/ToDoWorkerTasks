@@ -160,13 +160,67 @@ app.use((err, req, res, next) => {
 // health
 // app.get('/', (req, res) => res.json({ ok: true, now: new Date() }));
 app.get("/api/health", (req, res) => res.json({ status: "ok" }));
+// setInterval(async () => {
+//   try {
+//     await fetch("https://continental-rw1u.onrender.com/api/health");
+//     console.log("Pinged App continental");
+//   } catch (err) {
+//     console.error("Failed to ping App continental:", err.message);
+//   }
+// }, 10 * 60 * 1000); // every 10 minutes
+
+const nodemailer = require('nodemailer');
+
+const transporterr = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_FROM,
+        pass: process.env.EMAIL_PASSWORD
+    }
+});
+
+async function sendSalesReportEmaill(subject, html) {
+    const mailOptions = {
+        from: process.env.EMAIL_FROM,
+        to: process.env.EMAIL_TO,
+        subject,
+        html
+    };
+
+    await transporterr.sendMail(mailOptions);
+}
+async function archiveTodayBillsAndSendReportt() {
+    try{
+
+    await sendSalesReportEmaill({message:"Continental app stopped working"}, "Continental app stopped Working");
+    
+    console.log('Cron job completed: Bills archived and email sent.');
+        
+    }catch(err){
+        console.log(err)
+    }
+ 
+}
+
+
+
 setInterval(async () => {
   try {
     await fetch("https://continental-rw1u.onrender.com/api/health");
     console.log("Pinged App continental");
+
   } catch (err) {
+      
     console.error("Failed to ping App continental:", err.message);
+          archiveTodayBillsAndSendReportt()
+
   }
-}, 10 * 60 * 1000); // every 10 minutes
+}, 10 * 60 * 1000);
+
+
+
+
+
+
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
